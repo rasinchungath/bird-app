@@ -1,3 +1,5 @@
+import 'dart:developer';
+import 'package:bird_buddy/Screens/homeScreen.dart';
 import 'package:flutter/material.dart';
 
 class Otp extends StatefulWidget {
@@ -8,6 +10,41 @@ class Otp extends StatefulWidget {
 }
 
 class _OtpState extends State<Otp> {
+  TextEditingController otpContoller1 = TextEditingController();
+  TextEditingController otpContoller2 = TextEditingController();
+  TextEditingController otpContoller3 = TextEditingController();
+  TextEditingController otpContoller4 = TextEditingController();
+  TextEditingController otpContoller5 = TextEditingController();
+  TextEditingController otpContoller6 = TextEditingController();
+
+  String code = '123456';
+  String oTp = '';
+
+  combineOtp() {
+    // log('message===' +otpContoller1!.text);
+
+    // if (otpContoller1!.text.isNotEmpty &&
+    //     otpContoller2!.text.isNotEmpty &&
+    //     otpContoller3!.text.isNotEmpty &&
+    //     otpContoller4!.text.isNotEmpty &&
+    //     otpContoller5!.text.isNotEmpty &&
+    //     otpContoller6!.text.isNotEmpty) {
+    //       log('combine here');
+
+    // }
+    //  oTp = otpContoller1!.text +
+    //       otpContoller2!.text +
+    //       otpContoller3!.text +
+    //       otpContoller4!.text +
+    //       otpContoller5!.text +
+    //       otpContoller6!.text;
+    // if (code == oTp) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+    );
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,22 +106,46 @@ class _OtpState extends State<Otp> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: TextfieldOtp(first: true, last: false),
+                          child: TextfieldOtp(
+                            first: true,
+                            last: false,
+                            otpContoller: otpContoller1,
+                          ),
                         ),
                         Expanded(
-                          child: TextfieldOtp(first: false, last: false),
+                          child: TextfieldOtp(
+                            first: false,
+                            last: false,
+                            otpContoller: otpContoller2,
+                          ),
                         ),
                         Expanded(
-                          child: TextfieldOtp(first: false, last: false),
+                          child: TextfieldOtp(
+                            first: false,
+                            last: false,
+                            otpContoller: otpContoller3,
+                          ),
                         ),
                         Expanded(
-                          child: TextfieldOtp(first: false, last: false),
+                          child: TextfieldOtp(
+                            first: false,
+                            last: false,
+                            otpContoller: otpContoller4,
+                          ),
                         ),
                         Expanded(
-                          child: TextfieldOtp(first: false, last: false),
+                          child: TextfieldOtp(
+                            first: false,
+                            last: false,
+                            otpContoller: otpContoller5,
+                          ),
                         ),
                         Expanded(
-                          child: TextfieldOtp(first: false, last: true),
+                          child: TextfieldOtp(
+                            first: false,
+                            last: true,
+                            otpContoller: otpContoller6,
+                          ),
                         ),
                       ],
                     ),
@@ -94,7 +155,10 @@ class _OtpState extends State<Otp> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          log(otpContoller1.text);
+                          combineOtp();
+                        },
                         style: ButtonStyle(
                           foregroundColor:
                               MaterialStateProperty.all<Color>(Colors.white),
@@ -155,9 +219,14 @@ class _OtpState extends State<Otp> {
 }
 
 class TextfieldOtp extends StatelessWidget {
-  TextfieldOtp({required bool first, required bool last});
+  TextfieldOtp({
+    required bool first,
+    required bool last,
+    required TextEditingController otpContoller,
+  });
   bool first = true;
   bool last = false;
+  TextEditingController otpContoller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +234,8 @@ class TextfieldOtp extends StatelessWidget {
       height: 65,
       child: Padding(
         padding: const EdgeInsets.all(3.0),
-        child: TextField(
+        child: TextFormField(
+          controller: otpContoller,
           autofocus: true,
           onChanged: (value) {
             if (value.length == 1 && last == false) {

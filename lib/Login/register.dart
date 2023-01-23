@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'otp.dart';
@@ -10,6 +12,9 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  bool visible = false;
+
+  TextEditingController mobNumber = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,12 +73,26 @@ class _RegisterState extends State<Register> {
                 child: Column(
                   children: [
                     TextFormField(
+                      maxLength: 10,
+                      controller: mobNumber,
                       keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        if (value.length == 10) {
+                          setState(() {
+                            visible = true;
+                          });
+                        } else {
+                          setState(() {
+                            visible = false;
+                          });
+                        }
+                      },
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                       decoration: InputDecoration(
+                        counterText: '',
                         enabledBorder: OutlineInputBorder(
                             borderSide: const BorderSide(color: Colors.black12),
                             borderRadius: BorderRadius.circular(10)),
@@ -90,11 +109,13 @@ class _RegisterState extends State<Register> {
                             ),
                           ),
                         ),
-                        suffixIcon: const Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                          size: 28,
-                        ),
+                        suffixIcon: visible == true
+                            ? const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 28,
+                              )
+                            : null,
                       ),
                     ),
                     const SizedBox(
@@ -104,6 +125,8 @@ class _RegisterState extends State<Register> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
+                          log(mobNumber.text);
+
                           Navigator.of(context).push(
                             MaterialPageRoute(
                                 builder: (context) => const Otp()),

@@ -1,4 +1,4 @@
-import 'package:bird_buddy/Login/landingPage.dart';
+import 'package:bird_buddy/Login/WelcomePage.dart';
 import 'package:flutter/material.dart';
 
 void main() {

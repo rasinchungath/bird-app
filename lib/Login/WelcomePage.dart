@@ -36,7 +36,6 @@ class _WelcomeState extends State<Welcome> {
               ),
               const Text(
                 "The future is not something that happens to us, but something we create.",
-                
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
