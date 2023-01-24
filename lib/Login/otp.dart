@@ -1,49 +1,23 @@
-import 'dart:developer';
 import 'package:bird_buddy/Screens/homeScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
 
 class Otp extends StatefulWidget {
-  const Otp({super.key});
+  Otp({required this.mobNumber, required this.verificationId});
+  TextEditingController mobNumber;
+  String verificationId;
 
   @override
   _OtpState createState() => _OtpState();
 }
 
 class _OtpState extends State<Otp> {
-  TextEditingController otpContoller1 = TextEditingController();
-  TextEditingController otpContoller2 = TextEditingController();
-  TextEditingController otpContoller3 = TextEditingController();
-  TextEditingController otpContoller4 = TextEditingController();
-  TextEditingController otpContoller5 = TextEditingController();
-  TextEditingController otpContoller6 = TextEditingController();
+  
 
-  String code = '123456';
-  String oTp = '';
-
-  combineOtp() {
-    // log('message===' +otpContoller1!.text);
-
-    // if (otpContoller1!.text.isNotEmpty &&
-    //     otpContoller2!.text.isNotEmpty &&
-    //     otpContoller3!.text.isNotEmpty &&
-    //     otpContoller4!.text.isNotEmpty &&
-    //     otpContoller5!.text.isNotEmpty &&
-    //     otpContoller6!.text.isNotEmpty) {
-    //       log('combine here');
-
-    // }
-    //  oTp = otpContoller1!.text +
-    //       otpContoller2!.text +
-    //       otpContoller3!.text +
-    //       otpContoller4!.text +
-    //       otpContoller5!.text +
-    //       otpContoller6!.text;
-    // if (code == oTp) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
-    // }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -101,85 +75,16 @@ class _OtpState extends State<Otp> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: TextfieldOtp(
-                            first: true,
-                            last: false,
-                            otpContoller: otpContoller1,
-                          ),
-                        ),
-                        Expanded(
-                          child: TextfieldOtp(
-                            first: false,
-                            last: false,
-                            otpContoller: otpContoller2,
-                          ),
-                        ),
-                        Expanded(
-                          child: TextfieldOtp(
-                            first: false,
-                            last: false,
-                            otpContoller: otpContoller3,
-                          ),
-                        ),
-                        Expanded(
-                          child: TextfieldOtp(
-                            first: false,
-                            last: false,
-                            otpContoller: otpContoller4,
-                          ),
-                        ),
-                        Expanded(
-                          child: TextfieldOtp(
-                            first: false,
-                            last: false,
-                            otpContoller: otpContoller5,
-                          ),
-                        ),
-                        Expanded(
-                          child: TextfieldOtp(
-                            first: false,
-                            last: true,
-                            otpContoller: otpContoller6,
-                          ),
-                        ),
-                      ],
-                    ),
+                  children:  [
+                    FractionallySizedBox(
+                        widthFactor: 1, 
+                        child: PinputExample(
+                          mobNumber: widget.mobNumber,
+                          verificationId: widget.verificationId,
+                          ),),
                     const SizedBox(
-                      height: 22,
+                      height: 10,
                     ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          log(otpContoller1.text);
-                          combineOtp();
-                        },
-                        style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.white),
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.teal),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24.0),
-                            ),
-                          ),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(14.0),
-                          child: Text(
-                            'Verify',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 ),
               ),
@@ -218,49 +123,174 @@ class _OtpState extends State<Otp> {
   }
 }
 
-class TextfieldOtp extends StatelessWidget {
-  TextfieldOtp({
-    required bool first,
-    required bool last,
-    required TextEditingController otpContoller,
-  });
-  bool first = true;
-  bool last = false;
-  TextEditingController otpContoller = TextEditingController();
+class PinputExample extends StatefulWidget {
+   PinputExample({required this.mobNumber, required this.verificationId});
+  TextEditingController mobNumber;
+  String verificationId;
+
+  @override
+  State<PinputExample> createState() => _PinputExampleState();
+}
+
+class _PinputExampleState extends State<PinputExample> {
+  final pinController = TextEditingController();
+  final focusNode = FocusNode();
+  final formKey = GlobalKey<FormState>();
+   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+  void signInWithPhoneAuthCredential(
+      PhoneAuthCredential phoneAuthCredential) async {
+    setState(() {
+      //showLoading = true;
+    });
+
+    try {
+      final authCredential =
+          await _auth.signInWithCredential(phoneAuthCredential);
+
+      setState(() {
+        //showLoading = false;
+      });
+
+      if (authCredential.user != null) {
+        // ignore: use_build_context_synchronously
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+       // showLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('error occured'),
+      ));
+    }
+  }
+
+
+
+
+
+  @override
+  void dispose() {
+    pinController.dispose();
+    focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 65,
-      child: Padding(
-        padding: const EdgeInsets.all(3.0),
-        child: TextFormField(
-          controller: otpContoller,
-          autofocus: true,
-          onChanged: (value) {
-            if (value.length == 1 && last == false) {
-              FocusScope.of(context).nextFocus();
-            }
-            if (value.isEmpty && first == false) {
-              FocusScope.of(context).previousFocus();
-            }
-          },
-          showCursor: false,
-          readOnly: false,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          keyboardType: TextInputType.number,
-          maxLength: 1,
-          decoration: InputDecoration(
-            counter: const Offstage(),
-            enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(width: 2, color: Colors.black12),
-                borderRadius: BorderRadius.circular(12)),
-            focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(width: 2, color: Colors.teal),
-                borderRadius: BorderRadius.circular(12)),
+    const focusedBorderColor = Color.fromARGB(255, 25, 100, 86);
+    const fillColor = Color.fromRGBO(243, 246, 249, 0);
+    const borderColor = Color.fromRGBO(23, 171, 144, 0.4);
+
+    final defaultPinTheme = PinTheme(
+      width: 45,
+      height: 50,
+      textStyle: const TextStyle(
+        fontSize: 22,
+        color: Color.fromRGBO(30, 60, 87, 1),
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(19),
+        border: Border.all(color: borderColor),
+      ),
+    );
+
+    /// Optionally you can use form to validate the Pinput
+    return Form(
+      key: formKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Directionality(
+            // Specify direction if desired
+            textDirection: TextDirection.ltr,
+            child: Pinput(
+              length: 6,
+              controller: pinController,
+              focusNode: focusNode,
+              androidSmsAutofillMethod:
+                  AndroidSmsAutofillMethod.smsUserConsentApi,
+              listenForMultipleSmsOnAndroid: true,
+              defaultPinTheme: defaultPinTheme,
+              validator: (value) {
+                return value == ''? null : 'Pin is incorrect';
+              },
+              // onClipboardFound: (value) {
+              //   debugPrint('onClipboardFound: $value');
+              //   pinController.setText(value);
+              // },
+              hapticFeedbackType: HapticFeedbackType.lightImpact,
+              onCompleted: (pin) {
+                debugPrint('onCompleted: $pin');
+              },
+              onChanged: (value) {
+                debugPrint('onChanged: $value');
+              },
+              cursor: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 9),
+                    width: 22,
+                    height: 1,
+                    color: focusedBorderColor,
+                  ),
+                ],
+              ),
+              focusedPinTheme: defaultPinTheme.copyWith(
+                decoration: defaultPinTheme.decoration!.copyWith(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: focusedBorderColor),
+                ),
+              ),
+              submittedPinTheme: defaultPinTheme.copyWith(
+                decoration: defaultPinTheme.decoration!.copyWith(
+                  color: fillColor,
+                  borderRadius: BorderRadius.circular(19),
+                  border: Border.all(color: focusedBorderColor),
+                ),
+              ),
+              errorPinTheme: defaultPinTheme.copyBorderWith(
+                border: Border.all(color: Colors.redAccent),
+              ),
+            ),
           ),
-        ),
+          const SizedBox(
+            height: 50,
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () async {
+                PhoneAuthCredential phoneAuthCredential=  PhoneAuthProvider.credential(
+                    verificationId: widget.verificationId,
+                    smsCode: pinController.text);
+                    signInWithPhoneAuthCredential(phoneAuthCredential);
+
+              },
+              //onPressed: () => formKey.currentState!.validate(),
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.teal),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                ),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(14.0),
+                child: Text(
+                  'Verify',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

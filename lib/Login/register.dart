@@ -1,8 +1,12 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-
 import 'otp.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+// enum MobileVerificationState {
+//   SHOW_MOBILE_FORM_STATE,
+//   SHOW_OTP_FORM_STATE,
+// }
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -12,6 +16,19 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  // MobileVerificationState currentState =
+  //     MobileVerificationState.SHOW_MOBILE_FORM_STATE;
+
+  //final otpController = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String verificationId="";
+
+  bool showLoading = false;
+
+  
+
   bool visible = false;
 
   TextEditingController mobNumber = TextEditingController();
@@ -124,12 +141,47 @@ class _RegisterState extends State<Register> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          setState(() {
+                            showLoading = true;
+                          });
                           log(mobNumber.text);
+                          await _auth.verifyPhoneNumber(
+                            phoneNumber: '+91${mobNumber.text}',
+                            verificationCompleted: (PhoneAuthCredential) {
+                              setState(() {
+                                showLoading = false;
+                              });
+                              log('verifyphone number');
+                            },
+                            verificationFailed: (verificationFailed) async {
+                              setState(() {
+                                showLoading = false;
+                              });
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text('verification failed'),
+                              ));
+
+                              log('verification failed');
+                            },
+                            codeSent: (verificationId, resendingToken) async {
+                              setState(() {
+                                showLoading = false;
+                                // currentState =
+                                //     MobileVerificationState.SHOW_OTP_FORM_STATE;
+                                verificationId = verificationId;
+                              });
+                            },
+                            codeAutoRetrievalTimeout: (verificationId) {},
+                          );
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                                builder: (context) => const Otp()),
+                                builder: (context) => Otp(
+                                      mobNumber: mobNumber,
+                                      verificationId:verificationId,
+                                    )),
                           );
                         },
                         style: ButtonStyle(
